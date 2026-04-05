@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Tracking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+</head>
+
+<body>
+
+    <!-- Alert Banner -->
+    <div id="geofenceAlertBanner" class="alert-banner">
+        🚨 WARNING: Vehicle <span id="alertVehicleName"></span> HAS EXITED THE GEOFENCE!
+    </div>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>V-Track Portal</h3>
+                <span class="badge badge-primary mt-2">USER MODE</span>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <a class="nav-item active" data-tab="tab-map">Live Map</a>
+                <a class="nav-item" data-tab="tab-vehicles">My Vehicles</a>
+                <a class="nav-item" data-tab="tab-geofence">Geofence Setup</a>
+            </nav>
+            <div class="sidebar-header border-t">
+                <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h2>User Dashboard</h2>
+                <div id="userInfo" class="text-muted">Loading...</div>
+            </header>
+
+            <div class="content-area">
+
+                <!-- Tab: Live Map -->
+                <div id="tab-map" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Live Real-Time Tracking</h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Map Container -->
+                            <div id="map" class="map-container" style="border-radius: 0 0 8px 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Vehicles -->
+                <div id="tab-vehicles" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">My Vehicles</h3>
+                            <button class="btn btn-sm btn-primary" onclick="openAddVehicleModal()">+ Register
+                                Vehicle</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Hardware Device Key</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vehicleTableBody">
+                                        <!-- populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Geofence Setup -->
+                <div id="tab-geofence" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Configure Geofence</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="geofenceForm" class="mb-4">
+                                <div class="form-group">
+                                    <label>Select Vehicle</label>
+                                    <select id="geoVehicleSelect" class="form-control" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Radius (Meters)</label>
+                                    <input type="number" id="geoRadius" class="form-control" value="500" required>
+                                </div>
+                                <p class="text-muted mb-4 text-sm">Click anywhere on the map below to set the geofence
+                                    center point.</p>
+                                <div id="geoSetupMap" class="map-container mb-4" style="height: 300px;"></div>
+
+                                <input type="hidden" id="geoLat" required>
+                                <input type="hidden" id="geoLng" required>
+
+                                <button type="submit" class="btn btn-primary" id="saveGeoBtn">Save Geofence
+                                    Configuration</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="addVehicleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Register Vehicle</h3>
+                <button class="btn btn-sm" onclick="closeModal('addVehicleModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Vehicle Name</label>
+                    <input type="text" id="newVehicleName" class="form-control" placeholder="e.g. Campus Bus 1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm" onclick="closeModal('addVehicleModal')">Cancel</button>
+                <button class="btn btn-sm btn-primary" onclick="submitNewVehicle()">Register & Generate Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- Firebase JS SDKs (Modular) -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script src="js/api.js"></script>
+    <script type="module" src="js/dashboard_user.js"></script>
+
+    <script>
+        // Simple View routing
+        document.querySelectorAll('.nav-item').forEach(el => {
+            if (el.dataset.tab) {
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+
+                    el.classList.add('active');
+                    document.getElementById(el.dataset.tab).classList.remove('hidden');
+
+                    // Trigger map resize fix for Leaflet when un-hidden
+                    if (typeof invalidateMaps === 'function') invalidateMaps();
+                });
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>

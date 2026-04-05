@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Firebase (CRITICAL)
+firebase_admin_key.json
+
+# Frontend
+node_modules/
+dist/
+build/
+
+# VS Code
+.vscode/

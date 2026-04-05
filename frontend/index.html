@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking System - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Tracking System</h2>
+            <p class="subtitle">Enter your credentials to access the dashboard</p>
+            
+            <div id="errorMsg" class="text-danger text-center mb-4 hidden"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2" id="loginBtn">Sign In</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted" style="font-size: 0.875rem;">
+                    Invited by Admin? <br>
+                    <a href="complete_setup.html" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Complete Setup Here</a>
+                </p>
+            </div>
+            <div class="text-center mt-2">
+                <a href="forgot_password.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.textContent = 'Signing in...';
+            btn.disabled = true;
+            
+            try {
+                const res = await apiLogin(
+                    document.getElementById('username').value,
+                    document.getElementById('password').value
+                );
+                
+                // Redirect based on role
+                try {
+                    // Try to access an admin-only endpoint to check if user is an admin
+                    await apiFetch('/api/admin/users/');
+                    window.location.href = 'admin_dashboard.html';
+                } catch (roleErr) {
+                    // If it fails (e.g., 403 Forbidden), they are a regular user
+                    window.location.href = 'user_dashboard.html';
+                }
+            } catch (err) {
+                const errDiv = document.getElementById('errorMsg');
+                errDiv.textContent = err.message || 'Login failed';
+                errDiv.classList.remove('hidden');
+                btn.textContent = 'Sign In';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
