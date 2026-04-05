@@ -6,7 +6,7 @@ import random
 
 # Config
 API_URL = "http://127.0.0.1:8000/api/tracking/update"
-DEVICE_API_KEY = "183e6ef4-1052-44d5-b318-40f5c26a6188"
+DEVICE_API_KEY = "your-device-api-key"
 
 # Starting coords (approx Bangalore)
 curr_lat = 9.9252
