@@ -2,6 +2,13 @@
 
 this is a simple vehicle tracking app. it shows live location updates on a map. the backend handles data and the frontend displays it.
 
+## tech stack 
+1. Backend: Django, Django REST Framework
+2. Frontend: HTML, CSS, Vanilla JavaScript
+3. Database: SQLite
+4. Realtime: Firebase
+5. Simulation: Python (requests)
+
 ## running the backend
 
 1. open a terminal
