@@ -3,7 +3,7 @@ import time
 import random
 
 API_URL = "http://127.0.0.1:8000/api/tracking/update"
-DEVICE_API_KEY = "219164af-93c8-47e1-acd2-19319ac87147"
+DEVICE_API_KEY = "your-device-api-key"
 
 curr_lat = 13.0827
 curr_lng = 80.2707
