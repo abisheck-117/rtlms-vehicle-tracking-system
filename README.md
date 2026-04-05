@@ -51,6 +51,8 @@ this will keep sending location updates to the backend.
 
 ## notes
 
+* file `otp_server.py` is used to stimulate and 6 digit otp for a admin approved email-id which can be generated in the server logs.
+* sign-up can be done only through admin approval which must contain user's mobile number and e-mail id.
 * backend and frontend run separately (different ports)
 * firebase config is public (this is normal), access is controlled using rules
 * sensitive files are ignored using `.gitignore`
