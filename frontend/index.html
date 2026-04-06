@@ -3,72 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking System - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <title>RTLMS - Real Time Location Monitoring System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.4);
+            --bg-deep: #050914;
+            --text-main: #ffffff;
+            --text-muted: #8892b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-deep) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem;
+            background: rgba(10, 15, 30, 0.4);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05);
+            max-width: 800px;
+            animation: floatUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes floatUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tagline {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--primary-glow);
+            border-radius: 50px;
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a4b1cd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+
+        p.desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .btn-enter {
+            display: inline-block;
+            background: transparent;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 1rem 3rem;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .btn-enter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .btn-enter:hover {
+            background: var(--primary);
+            color: var(--bg-deep);
+            box-shadow: 0 0 30px var(--primary-glow), 0 0 60px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-enter:hover::before {
+            left: 100%;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            z-index: 10;
+            font-family: monospace;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff66;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.8s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; filter: blur(20px); transform: scale(1.1); }
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <h2>Tracking System</h2>
-            <p class="subtitle">Enter your credentials to access the dashboard</p>
-            
-            <div id="errorMsg" class="text-danger text-center mb-4 hidden"></div>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary mt-2" id="loginBtn">Sign In</button>
-            </form>
-            
-            <div class="text-center mt-4">
-                <p class="text-muted" style="font-size: 0.875rem;">
-                    Invited by Admin? <br>
-                    <a href="complete_setup.html" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Complete Setup Here</a>
-                </p>
-            </div>
-            <div class="text-center mt-2">
-                <a href="forgot_password.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
-            </div>
-        </div>
+    <canvas id="radarCanvas"></canvas>
+    <div class="overlay"></div>
+    
+    <div class="status-indicator">
+        <div class="pulse"></div>
+        SYSTEM ONLINE
     </div>
 
-    <!-- Scripts -->
-    <script src="js/api.js"></script>
+    <div class="content" id="mainContent">
+        <div class="tagline">Global Command Center</div>
+        <h1>Real-Time Location<br>Monitoring System</h1>
+        <p class="desc">Advanced vehicular tracking infrastructure. Monitor movement, establish precise geofences, and receive instantaneous telemetry alerts across your entire fleet.</p>
+        <a href="login.html" class="btn-enter" id="enterBtn">INITIALIZE SECURE LOGIN</a>
+    </div>
+
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            btn.textContent = 'Signing in...';
-            btn.disabled = true;
-            
-            try {
-                const res = await apiLogin(
-                    document.getElementById('username').value,
-                    document.getElementById('password').value
-                );
-                
-                // Redirect based on role
-                try {
-                    // Try to access an admin-only endpoint to check if user is an admin
-                    await apiFetch('/api/admin/users/');
-                    window.location.href = 'admin_dashboard.html';
-                } catch (roleErr) {
-                    // If it fails (e.g., 403 Forbidden), they are a regular user
-                    window.location.href = 'user_dashboard.html';
+        // Radar / Tracking Setup
+        const canvas = document.getElementById('radarCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let pings = [];
+        let time = 0;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Ping {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+                this.radius = Math.random() * 2 + 1;
+                this.baseAlpha = Math.random() * 0.5 + 0.3;
+                this.history = [];
+            }
+
+            update() {
+                // Keep history for trail
+                this.history.push({x: this.x, y: this.y});
+                if (this.history.length > 25) {
+                    this.history.shift();
                 }
-            } catch (err) {
-                const errDiv = document.getElementById('errorMsg');
-                errDiv.textContent = err.message || 'Login failed';
-                errDiv.classList.remove('hidden');
-                btn.textContent = 'Sign In';
-                btn.disabled = false;
+
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.speedX *= -1;
+                if (this.y < 0 || this.y > height) this.speedY *= -1;
+            }
+
+            draw() {
+                // Draw trail
+                if (this.history.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.history[0].x, this.history[0].y);
+                    for (let i = 1; i < this.history.length; i++) {
+                        ctx.lineTo(this.history[i].x, this.history[i].y);
+                    }
+                    ctx.strokeStyle = `rgba(0, 240, 255, ${this.baseAlpha * 0.3})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                // Draw blip
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 240, 255, ${this.baseAlpha})`;
+                ctx.fill();
+                
+                // Pulse effect on blip
+                const pulseSize = this.radius + Math.sin(time + this.x) * 4;
+                if (pulseSize > this.radius) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, pulseSize, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(0, 240, 255, 0.2)`;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Initialize pings (vehicles)
+        for(let i=0; i<40; i++) {
+            pings.push(new Ping());
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
+            ctx.lineWidth = 1;
+            const gridSize = 100;
+            
+            for(let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            
+            for(let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        // Radar Sweep
+        function drawRadar() {
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.max(width, height);
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(time * 0.5);
+            
+            const gradient = ctx.createConicGradient(0, 0, 0);
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0)');
+            gradient.addColorStop(0.9, 'rgba(0, 240, 255, 0)');
+            gradient.addColorStop(1, 'rgba(0, 240, 255, 0.1)');
+            
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Sweep line
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(radius, 0);
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            drawGrid();
+            drawRadar();
+            
+            pings.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            time += 0.05;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Page Transition
+        document.getElementById('enterBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            document.body.classList.add('fade-out');
+            
+            // Speed up radar
+            const speedUp = setInterval(() => {
+                time += 0.2;
+            }, 16);
+
+            setTimeout(() => {
+                clearInterval(speedUp);
+                window.location.href = href;
+            }, 800);
+        });
+
+        // Handle browser back button (BFCache restore)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || document.body.classList.contains('fade-out')) {
+                document.body.classList.remove('fade-out');
             }
         });
     </script>

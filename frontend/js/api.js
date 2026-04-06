@@ -25,7 +25,7 @@ async function apiFetch(endpoint, method = 'GET', body = null) {
     if (!res.ok) {
         if(res.status === 401 && endpoint !== '/api/auth/login/') {
             localStorage.removeItem('access_token');
-            window.location.href = 'index.html';
+            window.location.href = 'login.html';
         }
         throw new Error(data.error || data.detail || 'API request failed');
     }
