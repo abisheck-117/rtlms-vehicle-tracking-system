@@ -2,6 +2,13 @@
 
 this is a simple vehicle tracking app. it shows live location updates on a map. the backend handles data and the frontend displays it.
 
+## tech stack 
+1. Backend: Django, Django REST Framework
+2. Frontend: HTML, CSS, Vanilla JavaScript
+3. Database: SQLite
+4. Realtime: Firebase
+5. Simulation: Python (requests)
+
 ## running the backend
 
 1. open a terminal
@@ -44,6 +51,8 @@ this will keep sending location updates to the backend.
 
 ## notes
 
+* file `otp_server.py` is used to stimulate and 6 digit otp for a admin approved email-id which can be generated in the server logs.
+* sign-up can be done only through admin approval which must contain user's mobile number and e-mail id.
 * backend and frontend run separately (different ports)
 * firebase config is public (this is normal), access is controlled using rules
 * sensitive files are ignored using `.gitignore`
