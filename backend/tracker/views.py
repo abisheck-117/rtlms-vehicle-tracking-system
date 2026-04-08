@@ -127,6 +127,16 @@ class PasswordResetConfirmView(APIView):
         user.save()
         return Response({'message': 'Password reset successful'})
 
+class CheckUserExistsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone = request.data.get('phone')
+        if not phone:
+            return Response({'error': 'phone required'}, status=status.HTTP_400_BAD_REQUEST)
+        exists = User.objects.filter(phone_number=phone).exists()
+        return Response({'exists': exists})
+
 
 
 class UserListView(APIView):

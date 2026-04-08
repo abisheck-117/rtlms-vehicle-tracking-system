@@ -4,39 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracking System - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Modern crisp typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Euclid+Circular+A:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=1.1">
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <h2>Tracking System</h2>
-            <p class="subtitle">Enter your credentials to access the dashboard</p>
+<body class="split-auth-body">
+
+    <div class="login-split-card">
+        
+        <!-- Left Side: Edge to edge image -->
+        <div class="login-image-panel">
+            <div class="login-image-wrapper"></div>
+        </div>
+
+        <!-- Right Side: Form cleanly aligned left -->
+        <div class="login-form-panel">
+            <div class="form-header">
+                <div class="logo-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <h1 class="college-title">RTLMS Telemetry</h1>
+            </div>
+
+            <h2 class="auth-form-title">Sign In</h2>
+            <p class="auth-form-subtitle">The key to the dashboard is to sign in.</p>
             
-            <div id="errorMsg" class="text-danger text-center mb-4 hidden"></div>
+            <div id="errorMsg" class="hidden"></div>
             
             <form id="loginForm">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" class="form-control" required>
+                <div class="custom-form-group">
+                    <label class="custom-label">Username</label>
+                    <input type="text" id="username" class="custom-input" placeholder="Enter your username" required>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" class="form-control" required>
+                
+                <div class="custom-form-group">
+                    <label class="custom-label">Password</label>
+                    <input type="password" id="password" class="custom-input" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary mt-2" id="loginBtn">Sign In</button>
+                
+                <button type="submit" class="custom-btn" id="loginBtn">Access Dashboard</button>
             </form>
             
-            <div class="text-center mt-4">
-                <p class="text-muted" style="font-size: 0.875rem;">
-                    Invited by Admin? <br>
-                    <a href="complete_setup.html" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Complete Setup Here</a>
-                </p>
-            </div>
-            <div class="text-center mt-2">
-                <a href="forgot_password.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">Forgot Password?</a>
+            <div class="auth-form-footer">
+                <div>
+                    Invited by Admin? <a href="complete_setup.html" class="link-text">Complete Setup</a>
+                </div>
+                <div>
+                    <a href="forgot_password.html" class="link-text" style="color: #64748b;">Forgot Password?</a>
+                </div>
             </div>
         </div>
+
     </div>
 
     <!-- Scripts -->
@@ -45,7 +67,7 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
-            btn.textContent = 'Signing in...';
+            btn.textContent = 'Verifying...';
             btn.disabled = true;
             
             try {
@@ -54,20 +76,18 @@
                     document.getElementById('password').value
                 );
                 
-                // Redirect based on role
+                // Redirect based on role by tapping an admin API endpoint
                 try {
-                    // Try to access an admin-only endpoint to check if user is an admin
                     await apiFetch('/api/admin/users/');
                     window.location.href = 'admin_dashboard.html';
                 } catch (roleErr) {
-                    // If it fails (e.g., 403 Forbidden), they are a regular user
                     window.location.href = 'user_dashboard.html';
                 }
             } catch (err) {
                 const errDiv = document.getElementById('errorMsg');
-                errDiv.textContent = err.message || 'Login failed';
+                errDiv.textContent = err.message || 'Authentication failed. Please check your credentials.';
                 errDiv.classList.remove('hidden');
-                btn.textContent = 'Sign In';
+                btn.textContent = 'Access Dashboard';
                 btn.disabled = false;
             }
         });
